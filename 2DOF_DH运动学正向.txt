@@ -1,0 +1,80 @@
+clc;
+clear;
+
+% === 参数定义 ===
+l1 = 1.0;      % 连杆1长度
+l2 = 0.8;      % 连杆2长度
+
+% 关节角度序列（弧度）
+theta1_vals = linspace(0, pi/2, 100);
+theta2_vals = linspace(0, pi/2, 100);
+
+% 轨迹记录初始化
+x_traj = [];
+y_traj = [];
+
+% 创建图像窗口
+figure;
+axis equal;
+grid on;
+xlim([-0.1, l1 + l2 + 0.1]);
+ylim([-0.1, l1 + l2 + 0.1]);
+xlabel('X Position (m)');
+ylabel('Y Position (m)');
+title('2-DOF机械臂结构动画');
+
+for i = 1:length(theta1_vals)
+    theta1 = theta1_vals(i);
+    theta2 = theta2_vals(i);
+
+    % === DH变换矩阵 T1 ===
+    T1 = [cos(theta1), -sin(theta1), 0, l1*cos(theta1);
+          sin(theta1),  cos(theta1), 0, l1*sin(theta1);
+          0,            0,           1, 0;
+          0,            0,           0, 1];
+
+    % === DH变换矩阵 T2 ===
+    T2 = [cos(theta2), -sin(theta2), 0, l2*cos(theta2);
+          sin(theta2),  cos(theta2), 0, l2*sin(theta2);
+          0,            0,           1, 0;
+          0,            0,           0, 1];
+
+    % === 末端位姿 T = T1 * T2 ===
+    T = T1 * T2;
+
+    % === 各节点位置提取 ===
+    joint1 = [0; 0];
+    joint2 = T1(1:2, 4);           % 第二关节（连杆1末端）
+    end_effector = T(1:2, 4);      % 末端执行器
+
+    % === 保存末端轨迹 ===
+    x_traj(end+1) = end_effector(1);
+    y_traj(end+1) = end_effector(2);
+
+    % === 动态绘制机械臂 ===
+    clf;
+    hold on;
+
+    % 绘制连杆
+    plot([joint1(1), joint2(1)], [joint1(2), joint2(2)], 'r-', 'LineWidth', 4); % 连杆1
+    plot([joint2(1), end_effector(1)], [joint2(2), end_effector(2)], 'b-', 'LineWidth', 4); % 连杆2
+
+    % 绘制关节和末端
+    plot(joint1(1), joint1(2), 'ko', 'MarkerSize', 8, 'MarkerFaceColor', 'k');  % 基座
+    plot(joint2(1), joint2(2), 'go', 'MarkerSize', 8, 'MarkerFaceColor', 'g');  % 关节2
+    plot(end_effector(1), end_effector(2), 'mo', 'MarkerSize', 8, 'MarkerFaceColor', 'm'); % 末端
+
+    % 绘制轨迹
+    plot(x_traj, y_traj, 'k--');
+
+    % 设置图像属性
+    xlim([-0.1, l1 + l2 + 0.1]);
+    ylim([-0.1, l1 + l2 + 0.1]);
+    title('2-DOF机械臂结构与轨迹（MATLAB）');
+    xlabel('X Position (m)');
+    ylabel('Y Position (m)');
+    grid on;
+    axis equal;
+
+    pause(0.03); % 控制动画速度
+end
