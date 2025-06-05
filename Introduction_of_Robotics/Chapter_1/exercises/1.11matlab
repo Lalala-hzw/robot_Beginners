@@ -1,0 +1,19 @@
+
+% 发牌轮数
+N = 5;
+
+% 玩家位置
+players = {'P1', 'P2', 'P3', 'P4'};
+Pdeck = 'Pdeck';
+
+for round = 1:N
+    for i = 1:length(players)
+        move_to(Pdeck);         % 移动到洗牌位置
+        gripper_close();        % 抓取一张牌
+        
+        move_to(players{i});    % 移动到对应玩家
+        gripper_open();         % 放下牌
+    end
+end
+
+
