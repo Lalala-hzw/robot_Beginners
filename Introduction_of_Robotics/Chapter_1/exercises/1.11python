@@ -1,0 +1,14 @@
+# 发牌轮数
+N = 5
+
+# 玩家位置
+players = ["P1", "P2", "P3", "P4"]
+Pdeck = "Pdeck"
+
+for round in range(N):
+    for player in players:
+        move_to(Pdeck)        # 移动到洗牌位置
+        gripper_close()       # 抓取一张牌
+        
+        move_to(player)       # 移动到对应玩家位置
+        gripper_open()        # 放下牌
